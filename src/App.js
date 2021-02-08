@@ -11,7 +11,7 @@ const SEARCH_API = 'https://api.themoviedb.org/3/search/movie?api_key=d5fd329659
 function App () {
   const [movies, setMovies] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
-  const [error, setError] = useState([])
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     getMovies(POPULAR_API)
@@ -21,10 +21,12 @@ function App () {
     fetch(API)
       .then((res) => res.json())
       .then((data) => {
-        if (data.length === []) {
-          console.log('This is an empty array!')
-          setError({ type: 'error', message: 'There are no movies that match that search. Sorry try again!' })
-        } else { setMovies(data.results) }
+        console.log({ data })
+        setError(null)
+        if (data.results.length === 0) {
+          setError({ type: 'error', message: 'Sorry, there are no movies that match that search. Please try again!' })
+        }
+        setMovies(data.results)
       })
   }
   const handleSubmit = (event) => {
@@ -55,8 +57,8 @@ function App () {
         </form>
       </header>
       <div className='movie-container'>
-        {setError &&
-          <h3 className='error'>{setError}</h3>}
+        {error &&
+          <h3 className='error'>{error.message}</h3>}
         {/* mapped over the movies and for each create a movie component */}
         {movies.length > 0 &&
       movies.map((movie) => <Movie key={movie.id} {...movie} />)}
